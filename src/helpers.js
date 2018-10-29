@@ -4,7 +4,8 @@
 export function ab2str(buf) {
   return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
-function str2ab(str) {
+
+export function str2ab(str) {
   var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
   var bufView = new Uint16Array(buf);
   for (var i=0, strLen=str.length; i < strLen; i++) {
@@ -31,6 +32,36 @@ export async function sha256(message) {
   return hashHex;
 }
 
+export function validateTransaction (transaction) {
+  const validKeys = ['sender', 'receiver', 'type', 'amount'];
+  const validTypes = ['transfer', 'deposit', 'withdrawl'];
+  for (let key in transaction) {
+    const value = transaction[key];
+    
+    if (!validKeys.includes(key)) {
+      console.log("transaction includes invalid key: ", key)
+      return false
+    }
+    
+    if ((key === 'type') && !validTypes.includes(value)) {
+      console.log("Invalid transaction type: ", value);
+      return false
+    }
+
+    if (key === 'amount') {
+      if (typeof value !== "number") {
+        console.log("Amount is not a number");
+        return false;
+      }
+    } else {
+      if (typeof value !== "string"){
+        console.log("type of ", key, " is not string")
+        return false;
+      }
+    }
+  }
+  return true;
+}
 
 /* Usage
 
