@@ -66,7 +66,9 @@
         </div>
         <button @click="addTransactionToBlock()">Step 3: Corrupt block {{corruptBlock}} by adding transaction to it</button>
         <br>
-        <button @click="validateBlockchain()">Step 4: Validate Blockchain</button>
+        <button @click="addTransactionToBlockWithoutRecomputingTxRoot()">Step 4: Corrupt block {{corruptBlock}} by adding transaction to it without recomputing txRoot</button>
+        <br>
+        <button @click="validateBlockchain()">Step 5: Validate Blockchain</button>
         <p class="error">{{ this.error }}</p>
         <p class="message">{{ message }}</p>
       </div>
@@ -179,6 +181,10 @@ export default {
         this.error = "Cannot corrupt genesis block, choose another block to corrupt."
         return;
       }
+      if (this.corruptBlock > this.blockchain.chain.length) {
+        this.error = "Cannot corrupt a block that does not exist."
+        return;
+      }
 
       const transaction = {
         sender: this.newTransaction.sender,
@@ -198,6 +204,34 @@ export default {
 
       this.blockchain.addBlock(block, this.corruptBlock-1);
     },
+    addTransactionToBlockWithoutRecomputingTxRoot() {
+      if (this.corruptBlock < 2) {
+        this.error = "Cannot corrupt genesis block, choose another block to corrupt."
+        return;
+      }
+      if (this.corruptBlock > this.blockchain.chain.length) {
+        this.error = "Cannot corrupt a block that does not exist."
+        return;
+      }
+
+      const transaction = {
+        sender: this.newTransaction.sender,
+        receiver: this.newTransaction.receiver,
+        type: this.newTransaction.type,
+        amount: parseInt(this.newTransaction.amount),
+      };
+      
+      if (!validateTransaction(transaction)) {
+        this.error = "Cannot add transaction, because it failed validation.";
+        return;
+      }
+
+      const block = this.blockchain.chain[this.corruptBlock - 1];
+      
+      block.addTransaction(transaction);
+
+      this.blockchain.addBlockWithoutRecomputingTxRoot(block, this.corruptBlock-1);
+    },
     async validateBlockchain () {
       this.message = "";
       this.error = "";
@@ -211,7 +245,6 @@ export default {
   },
   async created () {
     this.blockchain = new Blockchain();
-    const genesisBlock = await this.blockchain.initializeWithGenesisBlock()
     let block1 = new Block()
     block1.addTransaction({
       sender: "Didrik",
@@ -245,6 +278,21 @@ export default {
     block1 = await this.blockchain.addBlock(block1);
     block2 = await this.blockchain.addBlock(block2);
 
+
+    // Test for Markle tree calculation:
+    const hash0 = await sha256(JSON.stringify(block1.transactions[0]));
+    const hash1 = await sha256(JSON.stringify(block1.transactions[1]));
+    const hash2 = await sha256(JSON.stringify(block1.transactions[2]));
+
+    const hash01 = await sha256(hash0+hash1);
+    const hash22 = await sha256(hash2+hash2);
+
+    const correctTxRoot = await sha256(hash01+hash22);
+    const txRoot = await block1.calculateMerkleRoot();
+
+    console.log(correctTxRoot);
+    console.log(txRoot);
+    console.log(correctTxRoot===txRoot);
 
   },
   components: {

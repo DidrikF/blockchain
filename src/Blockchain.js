@@ -4,6 +4,7 @@ import { sha256 } from './helpers';
 export default class Blockchain {
   constructor () {
     this.chain = [];
+    this.initializeWithGenesisBlock();
   }
 
   async initializeWithGenesisBlock () {
@@ -43,6 +44,19 @@ export default class Blockchain {
     return block
   }
 
+  async addBlockWithoutRecomputingTxRoot (block, index) {
+    let lastBlock = this.chain[index-1]
+    
+    // add prevHeader
+    const hashOfLastBlockHeader = await lastBlock.hashHeader();
+    block.prevHash = hashOfLastBlockHeader
+    
+    this.chain[index] = block;
+
+    // return the block
+    return block
+  }
+
   getLastBlock () {
     return this.chain[this.chain.length-1]
   }
@@ -75,6 +89,7 @@ export default class Blockchain {
       // changed the header of the block, causing it to miss-match with the next blocks prevHash)
       const currentTxRoot = await current.calculateMerkleRoot();
       if (current.txRoot !== currentTxRoot) {
+        console.log("txROot not mathc on block: ", current)
         this.chain[i].errors.push(new Error(`Merkle Root ${currentTxRoot} does not match the blocks transactions`));
         corruptionDiscovered = true;
       }
