@@ -45,7 +45,7 @@ If you are having issues with any of the dependencies I recommend deleting the "
 Your should now be ready to run the code.
 
 ### About the program
-The project was implemented in JavaScript, to be executed in the browser. Webpack and webpack-dev-server was used to bundle and server the HTML and JavaScript files involved. The graphical user interface (view) was build using the Vue front-end framework. By using Vue, dynamic binding between the elements on the page and the internal state of the application is abstracted away from the developer. The significant amount of event handlers necessary to implement the project in vanilla JavaScript is avoided by the use of the Vue. Whenever the application’s internal state changes, a re-render of the applications GUI is done automatically. Due to the technicalities of the GUI not being an important part of the project, the intricacies of the Vue framework and its usage in this project is not detailed in this report.
+The project was implemented in JavaScript, to be executed in the browser. Webpack and webpack-dev-server was used to bundle and server the HTML and JavaScript files involved. The graphical user interface (view) was build using the Vue front-end framework. By using Vue, dynamic binding between the elements on the page and the internal state of the application is abstracted away from the developer. The significant amount of event handlers necessary to implement the project in vanilla JavaScript is avoided by the use of the Vue. Whenever the application’s internal state changes, a re-render of the applications GUI is done automatically. Due to the technicalities of the GUI not being an important part of the project, the intricacies of the Vue framework and its usage in this project is not detailed here.
 
 For readers unfamiliar with the Vue framework, note the following:
 -	A Vue project is composed of components. A component independently handles its own state, has a render function expressing how it should be rendered in the Document Object Model (DOM), and holds various methods to work with the components data.
@@ -59,7 +59,7 @@ The blockchain implementation is split into two classes; Block and Blockchain. T
 
 In order to demonstrate how corrupted blocks are discovered through validating the chain of “prevHash” values, which depend on each other, methods were added to the Blockchain class. These methods can add transactions to blocks which are already members of the blockchain and validate the blockchain by recalculating all hashes in the chain. The validation method is able to find discrepancies in the hash values and register the errors on the block they concern. These errors are then reported to the user via the GUI. 
 
-The hashing algorithm used in this project is SHA256, this was chosen because it a hashing algorithm used in the Bitcoin network. It is also a more secure variant than its predecessor SHA-1. SHA256 is a cryptographically secure hashing algorithm, meaning that it is infeasible to compute the inverse of the hash and get back to the original value.
+The hashing algorithm used in this project is SHA256, it was chosen because it is a hashing algorithm used in the Bitcoin network. It is also a more secure variant than its predecessor SHA-1. SHA256 is a cryptographically secure hashing algorithm, meaning that it is infeasible to compute the inverse of the hash and get back to the original value.
 
 
 ### Run webpack-dev-server to serve the application to your browser
